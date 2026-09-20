@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Madeleine • Golden Hour</title>
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --med-teal: #14b8a6;
+      --med-dark-teal: #0f766e;
+      --med-pink: #f472b6;
+      --med-dark-pink: #db2777;
+      --gold: #f59e0b;
+      --text-dark: #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 10%, #fdf2f8 0%, #e0f2fe 45%, #ccfbf1 100%);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 12px;
+      overflow-x: hidden;
+    }
+
+    /* PANTALLA DE ENTRADA (OVERLAY DE BIENVENIDA) */
+    .welcome-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, #ffffff 0%, #ccfbf1 60%, #99f6e4 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .welcome-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .welcome-envelope {
+      background: #ffffff;
+      border: 2px dashed #14b8a6;
+      border-radius: 24px;
+      padding: 34px 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(20, 184, 166, 0.25);
+      animation: floatWelcome 3.5s infinite ease-in-out;
+    }
+
+    @keyframes floatWelcome {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .welcome-badge {
+      display: inline-block;
+      border: 1.5px solid #dc2626;
+      color: #dc2626;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      transform: rotate(-2deg);
+    }
+
+    .welcome-title {
+      font-family: 'Fredoka', cursive;
+      font-size: 1.8rem;
+      color: #0f766e;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .welcome-desc {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .open-box-btn {
+      appearance: none;
+      border: none;
+      background: linear-gradient(135deg, #14b8a6, #0f766e);
+      color: #fff;
+      font-family: 'Fredoka', cursive;
+      font-size: 1.15rem;
+      padding: 14px 28px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4);
+      transition: all 0.25s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .open-box-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 12px 26px rgba(20, 184, 166, 0.5);
+    }
+
+    /* Barra de Música Flotante (Golden Hour) */
+    .music-player-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1.5px solid #2dd4bf;
+      border-radius: 50px;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(20, 184, 166, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .vinyl-disc {
+      font-size: 1.5rem;
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+
+    .vinyl-disc.spin {
+      animation: spinDisc 3s linear infinite;
+    }
+
+    @keyframes spinDisc {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .song-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #0f766e;
+    }
+
+    .song-artist {
+      font-size: 0.72rem;
+      color: #64748b;
+    }
+
+    .play-btn {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      border: none;
+      color: #fff;
+      padding: 7px 18px;
+      border-radius: 20px;
+      font-family: 'Fredoka', cursive;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(20, 184, 166, 0.3);
+      transition: 0.2s;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Pestañas de Estaciones */
+    .nav-stations {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .station-btn {
+      appearance: none;
+      border: 1.5px solid var(--med-teal);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 9px 16px;
+      border-radius: 50px;
+      font-family: 'Fredoka', cursive;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: var(--med-dark-teal);
+      transition: all 0.25s;
+    }
+
+    .station-btn.active {
+      background: linear-gradient(135deg, var(--med-teal), #0d9488);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(20, 184, 166, 0.35);
+    }
+
+    /* Escenario Principal */
+    .main-stage {
+      width: 100%;
+      max-width: 680px;
+      min-height: 560px;
+      position: relative;
+    }
+
+    .panel {
+      display: none;
+      background: #ffffff;
+      border: 3px solid #2dd4bf;
+      border-radius: 28px;
+      padding: 10px;
+      box-shadow: 0 25px 60px rgba(20, 184, 166, 0.22);
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .panel-inner {
+      border: 2px dashed rgba(20, 184, 166, 0.45);
+      border-radius: 20px;
+      padding: 26px 22px;
+      background: linear-gradient(180deg, #ffffff 0%, #fcfdfd 100%);
+      position: relative;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ESTACIÓN 1: RECETA OFICIAL CON FOTO Y ECG */
+    .header-rx {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .caduceus {
+      width: 44px;
+      height: 44px;
+      fill: var(--med-teal);
+      margin: 0 auto 4px;
+    }
+
+    .sub-head {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--med-dark-teal);
+      font-weight: 700;
+    }
+
+    h1.title-main {
+      font-family: 'Fredoka', cursive;
+      font-size: 2.6rem;
+      color: #0d9488;
+      letter-spacing: 1px;
+      margin: 2px 0 10px;
+      text-transform: uppercase;
+    }
+
+    /* Ficha Médica con Foto */
+    .patient-card-profile {
+      background: #f0fdfa;
+      border: 1.5px solid #ccfbf1;
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .photo-frame {
+      width: 86px;
+      height: 86px;
+      border-radius: 14px;
+      border: 2px solid var(--med-teal);
+      background: #ccfbf1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(20, 184, 166, 0.25);
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .patient-vitals-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 14px;
+      width: 100%;
+    }
+
+    .meta-box strong {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--med-dark-teal);
+      text-transform: uppercase;
+    }
+
+    .meta-box span {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 0.92rem;
+    }
+
+    /* ECG & Auscultación */
+    .ecg-zone {
+      background: #021a24;
+      border-radius: 14px;
+      padding: 12px;
+      border: 1.5px solid #14b8a6;
+      margin-bottom: 16px;
+    }
+
+    .ecg-top {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: #5eead4;
+      margin-bottom: 6px;
+    }
+
+    canvas#ecgCanvas {
+      width: 100%;
+      height: 46px;
+      display: block;
+    }
+
+    .stetho-action {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px dashed rgba(94, 234, 212, 0.4);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .stetho-action:hover {
+      background: rgba(94, 234, 212, 0.15);
+    }
+
+    /* Prescripción & Jeringa Joy */
+    .rx-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+      font-size: 0.86rem;
+    }
+
+    .rx-badge {
+      background: #fdf2f8;
+      border: 1px solid var(--med-pink);
+      color: var(--med-dark-pink);
+      font-weight: 700;
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: 'Space Mono', monospace;
+      margin-right: 6px;
+    }
+
+    .syringe-box {
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .progress-bar {
+      height: 20px;
+      background: #e2e8f0;
+      border-radius: 50px;
+      overflow: hidden;
+      border: 2px solid #94a3b8;
+      position: relative;
+      margin: 6px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 30%;
+      background: linear-gradient(90deg, #2dd4bf, #f472b6);
+      transition: width 0.3s;
+    }
+
+    .progress-txt {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .btn-inject {
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-family: 'Fredoka', cursive;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    }
+
+    /* ESTACIÓN 2: CARTA CONFIDENCIAL CON SELLO */
+    .letter-envelope {
+      background: #fffdf7;
+      border: 2px solid #fde68a;
+      border-radius: 18px;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(217, 119, 6, 0.1);
+      text-align: center;
+    }
+
+    .confidential-stamp {
+      display: inline-block;
+      border: 2px solid #dc2626;
+      color: #dc2626;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 4px 14px;
+      border-radius: 6px;
+      letter-spacing: 2px;
+      transform: rotate(-3deg);
+      margin-bottom: 14px;
+    }
+
+    .wax-seal {
+      width: 85px;
+      height: 85px;
+      background: radial-gradient(circle, #ef4444, #991b1b);
+      border-radius: 50%;
+      margin: 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fef2f2;
+      font-size: 2.2rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(185, 28, 28, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .wax-seal:hover {
+      transform: scale(1.08) rotate(5deg);
+    }
+
+    .letter-body {
+      display: none;
+      text-align: left;
+      font-family: 'Caveat', cursive;
+      font-size: 1.55rem;
+      line-height: 1.55;
+      color: #451a03;
+      padding: 15px 10px;
+      animation: openLetter 0.6s ease-out forwards;
+    }
+
+    @keyframes openLetter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ESTACIÓN 3: RAYOS X CON FOTO Y LUZ UV */
+    .xray-stage {
+      background: #000;
+      border-radius: 16px;
+      padding: 16px;
+      min-height: 420px;
+      position: relative;
+      border: 3px solid #334155;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    .xray-header {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: #38bdf8;
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.3);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .xray-canvas-view {
+      position: relative;
+      height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #071926 0%, #000407 100%);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .ribs-bg {
+      width: 250px;
+      height: 250px;
+      opacity: 0.16;
+    }
+
+    .uv-reveal-layer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      -webkit-mask-image: radial-gradient(circle 105px at var(--uv-x, 50%) var(--uv-y, 50%), black 0%, transparent 100%);
+      mask-image: radial-gradient(circle 105px at var(--uv-x, 50%) var(--uv-y, 50%), black 0%, transparent 100%);
+    }
+
+    .xray-photo-peek {
+      width: 125px;
+      height: 125px;
+      border-radius: 50%;
+      border: 3px solid #f472b6;
+      overflow: hidden;
+      margin-bottom: 8px;
+      box-shadow: 0 0 20px rgba(244, 114, 182, 0.8);
+    }
+
+    .xray-photo-peek img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .xray-caption {
+      font-family: 'Caveat', cursive;
+      font-size: 1.4rem;
+      color: #fde047;
+      text-shadow: 0 0 10px rgba(253, 224, 71, 0.8);
+      text-align: center;
+      max-width: 320px;
+    }
+
+    /* ESTACIÓN 4: VALES MÉDICOS */
+    .voucher-item {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stamp-btn {
+      border: 2px solid #dc2626;
+      background: transparent;
+      color: #dc2626;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transform: rotate(-5deg);
+      transition: 0.2s;
+    }
+
+    .stamp-btn.stamped {
+      background: #dc2626;
+      color: #fff;
+      pointer-events: none;
+      transform: rotate(0deg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PANTALLA DE ENTRADA / BIENVENIDA -->
+  <div class="welcome-overlay" id="welcomeScreen">
+    <div class="welcome-envelope">
+      <div class="welcome-badge">ENTREGA CONFIDENCIAL</div>
+      <h2 class="welcome-title">Dra. Madeleine 🩺</h2>
+      <p class="welcome-desc">
+        Tiene un sobre clínico especial registrado para el día de hoy. Por favor, confirme su recepción:
+      </p>
+      <button class="open-box-btn" id="startExperienceBtn">
+        <span>Tocar para abrir entrega</span>
+        <span>🌸</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de Música (Golden Hour) -->
+  <header class="music-player-bar">
+    <div class="vinyl-disc" id="discIcon">🎹</div>
+    <div>
+      <div class="song-title">JVKE - golden hour (Violin & Piano)</div>
+      <div class="song-artist">Tu melodía especial</div>
+    </div>
+    <button class="play-btn" id="musicToggleBtn">⏸ Pausar</button>
+    
+    <audio id="bgAudio" loop preload="auto">
+      <source src="https://raw.githubusercontent.com/Jeyson-hub/mi-musica/93d6a78d44a851f77792e6933f72649c5e966190/Golden%20Hour%20-%20JVKE%20%20Violin%20%26%20Piano.mp3" type="audio/mpeg">
+    </audio>
+  </header>
+
+  <!-- Pestañas Superiores -->
+  <nav class="nav-stations">
+    <button class="station-btn active" onclick="setStation('rx')">📋 Ficha Clínica</button>
+    <button class="station-btn" onclick="setStation('letter')">💌 Carta Confidencial</button>
+    <button class="station-btn" onclick="setStation('xray')">🩻 Negatoscopio UV</button>
+    <button class="station-btn" onclick="setStation('vouchers')">🎟️ Vales Médicos</button>
+  </nav>
+
+  <main class="main-stage">
+
+    <!-- ESTACIÓN 1: RECETA OFICIAL CON FOTO Y ECG -->
+    <div class="panel active" id="panel-rx">
+      <div class="panel-inner">
+        <div class="header-rx">
+          <svg class="caduceus" viewBox="0 0 24 24">
+            <path d="M12 2a1 1 0 0 0-1 1v1.1c-1.3.3-2.3 1.2-2.7 2.4l1.9.7c.2-.6.7-1.1 1.4-1.2h.4v3.1c-2.4.6-4 2.1-4 4.1 0 1.9 1.4 3.4 3.5 4v1.8c-1.5.3-2.5 1.1-2.9 2.2l1.9.7c.2-.6.7-1 1.6-1.1v2.2a1 1 0 1 0 2 0v-2.2c.9.1 1.4.5 1.6 1.1l1.9-.7c-.4-1.1-1.4-1.9-2.9-2.2v-1.8c2.1-.6 3.5-2.1 3.5-4 0-2-1.6-3.5-4-4.1V6c.7.1 1.2.6 1.4 1.2l1.9-.7C16.3 5.3 15.3 4.4 14 4.1V3a1 1 0 0 0-1-1zm-1 7.2v3.6c-1.2-.4-2-1.2-2-2 0-.8.8-1.4 2-1.6zm2 0c1.2.2 2 .8 2 1.6 0 .8-.8 1.6-2 2V9.2z"/>
+          </svg>
+          <div class="sub-head">Prescripción Oficial • Cumpleaños Especial</div>
+          <h1 class="title-main">Happy Birthday</h1>
+        </div>
+
+        <!-- Ficha con tu foto de GitHub -->
+        <div class="patient-card-profile">
+          <div class="photo-frame">
+            <img id="userPhoto" src="https://raw.githubusercontent.com/Jeyson-hub/mi-musica/93d6a78d44a851f77792e6933f72649c5e966190/WhatsApp%20Image%202026-09-19%20at%2020.40.55.jpeg" alt="Madeleine">
+          </div>
+          <div class="patient-vitals-meta">
+            <div class="meta-box">
+              <strong>Especialista / Paciente:</strong>
+              <span>Madeleine (Made) 🌸</span>
+            </div>
+            <div class="meta-box">
+              <strong>Fecha de Emisión:</strong>
+              <span>20 de septiembre de 2026</span>
+            </div>
+            <div class="meta-box">
+              <strong>Diagnóstico:</strong>
+              <span style="color: #0d9488;">Luz Propia Inagotable</span>
+            </div>
+            <div class="meta-box">
+              <strong>Signos Vitales:</strong>
+              <span style="color: #db2777;">Felicidad Plena</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ECG & Auscultación -->
+        <div class="ecg-zone">
+          <div class="ecg-top">
+            <span>MONITOR SINUSAL</span>
+            <span id="bpmText">78 BPM ♡</span>
+          </div>
+          <canvas id="ecgCanvas"></canvas>
+          <div class="stetho-action" id="stethoClick">
+            <div>
+              <div style="color: #5eead4; font-weight: 700; font-size: 0.82rem;">🩺 Auscultar el corazón</div>
+              <div style="font-size: 0.72rem; color: #cbd5e1;">Haz clic para escuchar el latido real con el estetoscopio</div>
+            </div>
+            <span style="font-size: 1.6rem;">🫀</span>
+          </div>
+        </div>
+
+        <!-- Lista de Indicaciones -->
+        <ul class="rx-list">
+          <li><span class="rx-badge">DOSIS 1</span> <strong>Abrazos y Risas:</strong> Ingesta obligatoria y sin receta durante todo el día.</li>
+          <li><span class="rx-badge">DOSIS 2</span> <strong>Cero Guardias ni Estrés:</strong> Turno completamente libre para disfrutar.</li>
+          <li><span class="rx-badge">DOSIS 3</span> <strong>Pastel Ilimitado:</strong> Vía oral sin contraindicaciones.</li>
+        </ul>
+
+        <!-- Jeringa Joy -->
+        <div class="syringe-box">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #0f766e;">💉 Dosis de Alegría Acumulada</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="joyBar"></div>
+            <div class="progress-txt" id="joyTxt">30% DOSIS</div>
+          </div>
+          <button class="btn-inject" id="injectDoseBtn">Aplicar Dosis (+25%) 💊</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTACIÓN 2: CARTA CONFIDENCIAL CON SELLO -->
+    <div class="panel" id="panel-letter">
+      <div class="panel-inner">
+        <div class="letter-envelope">
+          <div class="confidential-stamp">CONFIDENCIAL • SOLO PARA MADELEINE</div>
+          <h2 style="font-family: 'Fredoka', cursive; color: #78350f; font-size: 1.4rem;">Historia Clínica de Sentimientos</h2>
+          <p style="font-size: 0.85rem; color: #92400e; margin-top: 4px;">
+            El sello solo puede ser roto por la cumpleañera. Haz clic en el sello de cera:
+          </p>
+
+          <div class="wax-seal" id="waxSealBtn" title="Haz clic para romper el sello">
+            <span>✉️</span>
+          </div>
+
+          <div class="letter-body" id="letterContent">
+            Querida Made: 🌸<br><br>
+            A veces no soy el mejor expresándome con palabras, pero hoy simplemente quería detenerme a desearte de todo corazón que <strong>siempre te vaya increíble en cada paso que des en la vida</strong>.<br><br>
+            Que nunca, por nada del mundo, dejes de ser esa persona tan maravillosa, dulce y auténtica que eres. Tienes un corazón inmenso y una luz que llena todo a tu alrededor.<br><br>
+            Quería agradecerte infinitamente por cada cosa que has hecho por mí, por estar ahí, y sobre todo... <strong>por ser mi felicidad</strong>.<br><br>
+            Sin importar la distancia ni los turnos pesados, hoy 20 de septiembre se celebra tu vida con todo el cariño del mundo. ¡Que tengas el cumpleaños más hermoso, Dra. Madeleine! ✨<br><br>
+            <div style="text-align: right; font-weight: 700; color: #0f766e; margin-top: 10px;">
+              — Con todo mi cariño y admiración.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTACIÓN 3: NEGATOSCOPIO UV (CON TU FOTO) -->
+    <div class="panel" id="panel-xray">
+      <div class="panel-inner">
+        <div class="xray-stage" id="xrayStage">
+          <div class="xray-header">
+            <span>PLACA TORÁCICA • PACIENTE: MADELEINE (20/09/2026)</span>
+            <span>MODO: LUZ ULTRAVIOLETA 🔦</span>
+          </div>
+          <div style="font-size: 0.78rem; color: #94a3b8; text-align: center; margin-bottom: 8px;">
+            Mueve el cursor o tu dedo sobre el tórax para iluminar el interior:
+          </div>
+          <div class="xray-canvas-view" id="xrayCanvasView">
+            <svg class="ribs-bg" viewBox="0 0 200 200" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round">
+              <path d="M100 20 V180"/>
+              <path d="M70 50 Q100 30 130 50"/>
+              <path d="M50 75 Q100 50 150 75"/>
+              <path d="M40 105 Q100 70 160 105"/>
+              <path d="M45 135 Q100 100 155 135"/>
+              <path d="M60 160 Q100 130 140 160"/>
+            </svg>
+
+            <!-- Revelación UV con tu foto de GitHub -->
+            <div class="uv-reveal-layer" id="uvLayer">
+              <div class="xray-photo-peek">
+                <img id="xrayPhoto" src="https://raw.githubusercontent.com/Jeyson-hub/mi-musica/93d6a78d44a851f77792e6933f72649c5e966190/WhatsApp%20Image%202026-09-19%20at%2020.40.55.jpeg" alt="Madeleine">
+              </div>
+              <div class="xray-caption">
+                "Hallazgo clínico: La persona más especial e increíble alojada en el corazón."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTACIÓN 4: VALES MÉDICOS -->
+    <div class="panel" id="panel-vouchers">
+      <div class="panel-inner">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <h2 style="font-family: 'Fredoka', cursive; color: #b45309; font-size: 1.5rem;">🎟️ Talonario de Vales Clínicos</h2>
+          <p style="font-size: 0.82rem; color: #78350f;">Haz clic para estampar tu sello de canje oficial:</p>
+        </div>
+
+        <div class="voucher-item">
+          <div>
+            <h3 style="font-family: 'Fredoka', cursive; color: #b45309; font-size: 1.1rem;">☕ Dosis de Cafeína de Emergencia</h3>
+            <p style="font-size: 0.8rem; color: #78350f;">Válido por tu café helado o merienda favorita post-guardia.</p>
+          </div>
+          <button class="stamp-btn" onclick="stampCard(this)">Estampar</button>
+        </div>
+
+        <div class="voucher-item">
+          <div>
+            <h3 style="font-family: 'Fredoka', cursive; color: #b45309; font-size: 1.1rem;">🎬 Terapia de Películas & Risas</h3>
+            <p style="font-size: 0.8rem; color: #78350f;">Válido por una tarde completa de maratón sin interrupciones.</p>
+          </div>
+          <button class="stamp-btn" onclick="stampCard(this)">Estampar</button>
+        </div>
+
+        <div class="voucher-item">
+          <div>
+            <h3 style="font-family: 'Fredoka', cursive; color: #b45309; font-size: 1.1rem;">😴 Licencia Oficial de Sueño</h3>
+            <p style="font-size: 0.8rem; color: #78350f;">Válido por horas ilimitadas de siesta sin alarmas.</p>
+          </div>
+          <button class="stamp-btn" onclick="stampCard(this)">Estampar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // --- CONTROL DE AUDIO & OVERLAY DE ENTRADA ---
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const startBtn = document.getElementById('startExperienceBtn');
+    const audio = document.getElementById('bgAudio');
+    const playBtn = document.getElementById('musicToggleBtn');
+    const disc = document.getElementById('discIcon');
+
+    startBtn.addEventListener('click', () => {
+      welcomeScreen.classList.add('hidden');
+      
+      // Reproducir audio sin bloqueo del navegador
+      audio.play().then(() => {
+        playBtn.textContent = '⏸ Pausar';
+        disc.classList.add('spin');
+      }).catch(err => {
+        console.log("Audio play error", err);
+      });
+
+      // Confeti de bienvenida
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#14b8a6', '#f472b6', '#fde047', '#2dd4bf']
+      });
+    });
+
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play().then(() => {
+          playBtn.textContent = '⏸ Pausar';
+          disc.classList.add('spin');
+        });
+      } else {
+        audio.pause();
+        playBtn.textContent = '▶ Reproducir';
+        disc.classList.remove('spin');
+      }
+    });
+
+    // Pestañas
+    function setStation(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.station-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // --- MONITOR CARDÍACO ECG ---
+    const ecgCanvas = document.getElementById('ecgCanvas');
+    const ecgCtx = ecgCanvas.getContext('2d');
+    let ecgX = 0, ecgY = 23, ecgStep = 0;
+
+    function resizeEcg() {
+      ecgCanvas.width = ecgCanvas.parentElement.clientWidth - 24;
+      ecgCanvas.height = 46;
+    }
+    window.addEventListener('resize', resizeEcg);
+    resizeEcg();
+
+    function drawECG() {
+      ecgCtx.fillStyle = 'rgba(2, 26, 36, 0.08)';
+      ecgCtx.fillRect(0, 0, ecgCanvas.width, ecgCanvas.height);
+
+      let nextY = 23;
+      const cycle = ecgStep % 48;
+      if (cycle === 6) nextY = 18;
+      else if (cycle === 14) nextY = 30;
+      else if (cycle === 16) nextY = 5;
+      else if (cycle === 18) nextY = 38;
+      else if (cycle === 26) nextY = 17;
+
+      ecgCtx.beginPath();
+      ecgCtx.strokeStyle = '#5eead4';
+      ecgCtx.lineWidth = 2;
+      ecgCtx.shadowBlur = 6;
+      ecgCtx.shadowColor = '#5eead4';
+      ecgCtx.moveTo(ecgX, ecgY);
+      ecgCtx.lineTo(ecgX + 2, nextY);
+      ecgCtx.stroke();
+
+      ecgX += 2;
+      ecgY = nextY;
+      ecgStep++;
+
+      if (ecgX >= ecgCanvas.width) {
+        ecgX = 0;
+        ecgCtx.clearRect(0, 0, ecgCanvas.width, ecgCanvas.height);
+      }
+      requestAnimationFrame(drawECG);
+    }
+    drawECG();
+
+    // --- LATIDO CARDÍACO (LUB-DUB) ---
+    let soundCtx = null;
+    function getSoundContext() {
+      if (!soundCtx) soundCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (soundCtx.state === 'suspended') soundCtx.resume();
+      return soundCtx;
+    }
+
+    function playHeartbeatSound() {
+      const ctx = getSoundContext();
+      const now = ctx.currentTime;
+      const o1 = ctx.createOscillator();
+      const g1 = ctx.createGain();
+      o1.frequency.setValueAtTime(65, now);
+      g1.gain.setValueAtTime(0.4, now);
+      g1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      o1.connect(g1);
+      gain1 = g1;
+      g1.connect(ctx.destination);
+      o1.start(now);
+      o1.stop(now + 0.12);
+
+      const o2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      o2.frequency.setValueAtTime(80, now + 0.15);
+      g2.gain.setValueAtTime(0.3, now + 0.15);
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+      o2.connect(g2);
+      g2.connect(ctx.destination);
+      o2.start(now + 0.15);
+      o2.stop(now + 0.26);
+    }
+
+    document.getElementById('stethoClick').addEventListener('click', () => {
+      playHeartbeatSound();
+      const bpm = document.getElementById('bpmText');
+      bpm.textContent = "120 BPM ♡ (EMOCIÓN)";
+      bpm.style.color = "#f472b6";
+      confetti({ particleCount: 30, spread: 50 });
+      setTimeout(() => {
+        bpm.textContent = "78 BPM ♡";
+        bpm.style.color = "#5eead4";
+      }, 1600);
+    });
+
+    // --- JERINGA JOY ---
+    let dose = 30;
+    document.getElementById('injectDoseBtn').addEventListener('click', () => {
+      if (dose < 100) {
+        dose += 25;
+        if (dose > 100) dose = 100;
+        document.getElementById('joyBar').style.width = dose + '%';
+        document.getElementById('joyTxt').textContent = dose + '% DOSIS';
+        playHeartbeatSound();
+        confetti({ particleCount: 40, spread: 60, colors: ['#2dd4bf', '#f472b6', '#ffd166'] });
+      }
+    });
+
+    // --- SELLO Y CARTA SECRETA ---
+    const seal = document.getElementById('waxSealBtn');
+    const letter = document.getElementById('letterContent');
+    seal.addEventListener('click', () => {
+      seal.style.display = 'none';
+      letter.style.display = 'block';
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ['#ef4444', '#f59e0b', '#f472b6', '#2dd4bf']
+      });
+      if (audio.paused) {
+        audio.play().then(() => {
+          playBtn.textContent = '⏸ Pausar';
+          disc.classList.add('spin');
+        }).catch(()=>{});
+      }
+    });
+
+    // --- NEGATOSCOPIO UV ---
+    const xrayView = document.getElementById('xrayCanvasView');
+    function updateUV(x, y) {
+      xrayView.style.setProperty('--uv-x', `${x}px`);
+      xrayView.style.setProperty('--uv-y', `${y}px`);
+    }
+    xrayView.addEventListener('mousemove', (e) => {
+      const r = xrayView.getBoundingClientRect();
+      updateUV(e.clientX - r.left, e.clientY - r.top);
+    });
+    xrayView.addEventListener('touchmove', (e) => {
+      const r = xrayView.getBoundingClientRect();
+      updateUV(e.touches[0].clientX - r.left, e.touches[0].clientY - r.top);
+    });
+
+    // --- ESTAMPAR VALES ---
+    function stampCard(btn) {
+      btn.textContent = "✓ APROBADO";
+      btn.classList.add('stamped');
+      confetti({ particleCount: 45, spread: 50, colors: ['#dc2626', '#f59e0b', '#2dd4bf'] });
+    }
+  </script>
+</body>
+</html>
